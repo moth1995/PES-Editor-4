@@ -24,7 +24,7 @@ class OptionFile:
 
         self.read_option_file()
 
-        self.set_clubs()
+        #self.set_clubs()
 
     def get_game_type(self, file_name):
         """
