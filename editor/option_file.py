@@ -5,14 +5,19 @@ from enum import Enum, auto
 
 from .option_file_data import (
     OF_BYTE_LENGTH,
+    OF_BLOCK,
+    OF_BLOCK_SIZE,
     OF_KEY_PC,
 )
 
 from .club import Club
 
+from .utils.common_functions import bytes_to_int, zero_fill_right_shift
 
 class OptionFile:
     of_byte_length = OF_BYTE_LENGTH
+    of_block = OF_BLOCK
+    of_block_size = OF_BLOCK_SIZE
     of_key_pc = OF_KEY_PC
 
     def __init__(self, file_location):
@@ -24,7 +29,7 @@ class OptionFile:
 
         self.read_option_file()
 
-        self.set_clubs()
+        #self.set_clubs()
 
     def get_game_type(self, file_name):
         """
@@ -85,24 +90,15 @@ class OptionFile:
                 key = 0
 
     def checksums(self):
-        self.sum8(8, 3496);
-        self.sum8(4112, 1832);
-        self.sum8(5952, 2784);
-        self.sum8(8744, 22816);
-        self.sum8(31568, 620000);
-        self.sum8(651576, 145786);
-        self.sum8(797372, 19320);
-        self.sum8(816700, 105408);
-        self.sum8(922116, 266240);
-        self.sum8(1188364, 75372);
+        """
+        Set checksums.
+        """
+        for i in range(len(self.of_block)):
+            checksum = 0
 
-    def sum8(self, start, length):
-        sum8 = 0;
-        for a in range(length):
-            sum8 += self.data[start + a];
-        sum8 &= 0xFF;
-        self.data[start - 4] = (sum8);
-
+            for a in range(self.of_block_size[i]):
+                checksum += self.data[self.of_block[i] + a]
+            self.data[self.of_block[i] - 4] = checksum & 0xFF
 
     def set_clubs(self):
         """
